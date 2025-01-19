@@ -1,4 +1,5 @@
-﻿using ChatClient.Net.IO;
+﻿using ChatClient.Common;
+using ChatClient.Net.IO;
 using System;
 using System.Net.Sockets;
 
@@ -16,11 +17,16 @@ namespace ChatClient.Net
             if (!_client.Connected)
             {
                 _client.Connect("127.0.0.1", 7891);
-                var connectPacket = new PacketBuilder();
-                connectPacket.WriteOpCode(0);
-                connectPacket.WriteString(username);
-                _client.Client.Send(connectPacket.GetPacketBytes());
+                SendInitDataPackage(username);
             }
+        }
+
+        private void SendInitDataPackage(string username)
+        {
+            var connectPacket = new PacketBuilder();
+            connectPacket.WriteOpCode((byte)ClientToServerOperations.InitData);
+            connectPacket.WriteString(username);
+            _client.Client.Send(connectPacket.GetPacketBytes());
         }
 
         private TcpClient _client;
