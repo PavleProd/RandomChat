@@ -9,7 +9,7 @@ namespace ChatServer.Net.IO
         {
             _memoryStream = new MemoryStream();
         }
-        public byte[] GetRawPacket()
+        public byte[] GetRawData()
         {
             return _memoryStream.GetBuffer();
         }

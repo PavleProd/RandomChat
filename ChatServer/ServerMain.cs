@@ -21,7 +21,7 @@ namespace ChatServer
 
                 PacketBuilder builder = new PacketBuilder();
                 builder.WriteMessage(new Common.Message("123", "Uspesno uspostavljena konekcija!"));
-                client.ClientSocket.Client.Send(builder.GetRawPacket());
+                client.ClientSocket.Client.Send(builder.GetRawData());
 
                 // TODO:
                 // uparivanje sa drugim klijentima

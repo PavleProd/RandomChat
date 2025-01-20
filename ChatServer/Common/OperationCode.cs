@@ -2,8 +2,9 @@
 {
     internal enum OperationCode : byte
     {
-        Invalid = 0,
+        None = 0,
         InitData = 1,
-        Message = 2
+        Message = 2,
+        Invalid = 3
     }
 }

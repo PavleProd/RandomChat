@@ -10,7 +10,7 @@ namespace ChatClient.Net.IO
         {
             _memoryStream = new MemoryStream();
         }
-        public byte[] GetRawPacket()
+        public byte[] GetRawData()
         {
             return _memoryStream.GetBuffer();
         }
@@ -20,6 +20,12 @@ namespace ChatClient.Net.IO
             WriteOpCode(OperationCode.Message);
             WriteString(message.AuthorId);
             WriteString(message.Text);
+        }
+
+        public void WriteInitData(string username)
+        {
+            WriteOpCode(OperationCode.InitData);
+            WriteString(username);
         }
 
         private void WriteOpCode(OperationCode opcode)

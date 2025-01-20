@@ -1,6 +1,5 @@
 ﻿using ChatServer.Common;
 using System.Net.Sockets;
-using System.Text;
 
 namespace ChatServer.Net.IO
 {

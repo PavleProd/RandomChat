@@ -18,7 +18,7 @@ namespace ChatClient.Net
                 _client.Connect("127.0.0.1", 7891);
                 _packetReader = new PacketReader(_client.GetStream());
 
-                SendInitDataPackage(username);
+                SendInitDataPacket(username);
 
                 Task.Run(() => ReadPackets());
             }
@@ -27,6 +27,11 @@ namespace ChatClient.Net
         public bool IsConnected()
         {
             return _client.Connected;
+        }
+
+        public void Disconnect()
+        {
+            _client.Close();
         }
 
         public void ReadPackets()
@@ -64,17 +69,16 @@ namespace ChatClient.Net
             MessageReceived?.Invoke(message);
         }
 
-        public void Disconnect()
+        public void SendPacket(PacketBuilder builder)
         {
-            _client.Close();
-        }
+            _client.Client.Send(builder.GetRawData());
+        }            
 
-        private void SendInitDataPackage(string username)
+        private void SendInitDataPacket(string username)
         {
-            var connectPacket = new PacketBuilder();
-            connectPacket.WriteOpCode((byte)OperationCode.InitData);
-            connectPacket.WriteString(username);
-            _client.Client.Send(connectPacket.GetPacketBytes());
+            var packetBuilder = new PacketBuilder();
+            packetBuilder.WriteInitData(username);
+            SendPacket(packetBuilder);
         }
 
         public event Action<Message> MessageReceived;

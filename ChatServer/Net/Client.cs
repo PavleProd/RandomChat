@@ -33,7 +33,7 @@ namespace ChatServer.Net
         {
             var packetBuilder = new PacketBuilder();
             packetBuilder.WriteMessage(message);
-            ClientSocket.Client.Send(packetBuilder.GetRawPacket());
+            ClientSocket.Client.Send(packetBuilder.GetRawData());
         }
 
         public void ProcessPackets()
@@ -47,8 +47,13 @@ namespace ChatServer.Net
                     var opCode = _packetReader.ReadOpCode();
                     switch (opCode)
                     {
+                        case OperationCode.None:
+                            {
+                                break;
+                            }
                         case OperationCode.Message:
                             {
+                                Message message = _packetReader.ReadMessage();
                                 break;
                             }
                         default:
@@ -58,8 +63,9 @@ namespace ChatServer.Net
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 Console.WriteLine($"[{Id}]: Disconnected!");
                 ClientSocket.Close();
             }
