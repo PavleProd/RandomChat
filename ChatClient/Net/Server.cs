@@ -15,7 +15,7 @@ namespace ChatClient.Net
         {
             if (!IsConnected())
             {
-                _client.Connect("127.0.0.1", 7891);
+                _client.Connect("127.0.0.1", 24901);
                 _packetReader = new PacketReader(_client.GetStream());
 
                 SendInitDataPacket(username);

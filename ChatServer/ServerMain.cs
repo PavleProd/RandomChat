@@ -10,7 +10,7 @@ namespace ChatServer
         public static void Main(string[] args)
         {
             _clients = new List<Client>();
-            _listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 7891);
+            _listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 24901);
 
             _listener.Start();
 
