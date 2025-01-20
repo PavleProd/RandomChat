@@ -37,7 +37,7 @@ namespace ChatClient.Net
                     var opCode = _packetReader.ReadOpCode();
                     switch (opCode)
                     {
-                        case ServerToClientOperations.Message:
+                        case OperationCode.Message:
                         {
                             ReceiveMessage();
                             break;
@@ -67,7 +67,7 @@ namespace ChatClient.Net
         private void SendInitDataPackage(string username)
         {
             var connectPacket = new PacketBuilder();
-            connectPacket.WriteOpCode((byte)ClientToServerOperations.InitData);
+            connectPacket.WriteOpCode((byte)OperationCode.InitData);
             connectPacket.WriteString(username);
             _client.Client.Send(connectPacket.GetPacketBytes());
         }

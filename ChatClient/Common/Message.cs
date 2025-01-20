@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ChatClient.Common
+﻿namespace ChatClient.Common
 {
     readonly struct Message
     {
@@ -12,10 +6,10 @@ namespace ChatClient.Common
         {
             AuthorId = authorId;
             Text = text;
-            SendingTime = DateTime.Now;
+            SendingTime = DateTime.Now; // TODO: sending time treba da se postavlja na now samo u porukama koje se salju
         }
 
-        public override string ToString() 
+        public override string ToString()
         {
             return $"[{SendingTime}] | {AuthorId}: {Text}";
         }

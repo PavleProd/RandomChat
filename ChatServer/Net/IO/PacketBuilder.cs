@@ -1,10 +1,5 @@
 ﻿using ChatServer.Common;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ChatServer.Net.IO
 {
@@ -14,22 +9,21 @@ namespace ChatServer.Net.IO
         {
             _memoryStream = new MemoryStream();
         }
-
-        public void WriteOpCode(ServerToClientOperations opcode)
+        public byte[] GetRawPacket()
         {
-            _memoryStream.WriteByte((byte)opcode);
+            return _memoryStream.GetBuffer();
         }
 
         public void WriteMessage(Message message)
         {
-            WriteOpCode(ServerToClientOperations.Message);
+            WriteOpCode(OperationCode.Message);
             WriteString(message.AuthorId);
             WriteString(message.Text);
         }
 
-        public byte[] GetPacketBytes()
+        private void WriteOpCode(OperationCode opcode)
         {
-            return _memoryStream.GetBuffer();
+            _memoryStream.WriteByte((byte)opcode);
         }
 
         private void WriteString(string message)
@@ -39,6 +33,6 @@ namespace ChatServer.Net.IO
             _memoryStream.Write(Encoding.ASCII.GetBytes(message));
         }
 
-        private MemoryStream _memoryStream;
+        private readonly MemoryStream _memoryStream;
     }
 }

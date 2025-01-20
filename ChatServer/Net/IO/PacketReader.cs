@@ -10,43 +10,32 @@ namespace ChatServer.Net.IO
         {
             _networkStream = networkStream;
         }
-
-        public ClientToServerOperations ReadOpCode()
+        public OperationCode ReadOpCode()
         {
-            return (ClientToServerOperations)_networkStream.ReadByte();
+            return (OperationCode)_networkStream.ReadByte();
         }
 
         public Message ReadMessage()
         {
-            string id = ToString(ReadField());
-            string message = ToString(ReadField());
+            string id = ReadField().ToString();
+            string message = ReadField().ToString();
 
             return new Message(id, message);
         }
 
         public string ReadUsername()
         {
-            return ToString(ReadField());
+            return ReadField().ToString();
         }
 
-        private byte[] ReadField()
+        private PacketField ReadField()
         {
             byte[] messageBuffer;
             var fieldLength = ReadInt32();
             messageBuffer = new byte[fieldLength];
 
             _networkStream.Read(messageBuffer, 0, fieldLength);
-            return messageBuffer;
-        }
-
-        private int ToInt(byte[] field)
-        {
-            return BitConverter.ToInt32(field, 0);
-        }
-
-        private string ToString(byte[] field)
-        {
-            return Encoding.ASCII.GetString(field);
+            return new PacketField(messageBuffer);
         }
 
         private NetworkStream _networkStream;
