@@ -10,6 +10,6 @@
     {
         Invalid = 0,
         ConnectionEstablished = 1,
-        ReceivingMessage = 2
+        Message = 2
     }
 }

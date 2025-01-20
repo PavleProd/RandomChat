@@ -28,7 +28,16 @@
                 HorizontalAlignment="Left"
                 Content="Connect" 
                 Command="{Binding ConnectToServerCommand}"/>
+
+                <Button Height="25" Width="125" Margin="0,0,25,0"
+                        HorizontalAlignment="Right"
+                        Content="Disconnect"
+                        Command="{Binding DisconnectFromServerCommand}" />
             </DockPanel>
+
+            <StackPanel Grid.Column="1">
+                <ListView ItemsSource="{Binding Messages}"/>
+            </StackPanel>
 
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
