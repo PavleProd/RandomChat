@@ -4,7 +4,7 @@ using ChatServer.Net;
 
 namespace ChatServer
 {
-    class Program
+    class ServerMain
     {
         public static void Main(string[] args)
         {
