@@ -18,6 +18,7 @@ namespace ChatServer
                 _clients.Add(client);
 
                 client.WriteMessage(new Common.Message("123", "Konekcija uspesno uspostavljena!"));
+                
             }
         }
 

@@ -35,7 +35,7 @@
                         Command="{Binding DisconnectFromServerCommand}" />
             </DockPanel>
 
-            <StackPanel Grid.Column="1">
+            <StackPanel Grid.Row="1">
                 <ListView ItemsSource="{Binding Messages}"/>
             </StackPanel>
 

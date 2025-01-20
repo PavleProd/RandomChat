@@ -27,6 +27,11 @@ namespace ChatServer.Net.IO
             WriteString(message.Text);
         }
 
+        public byte[] GetPacketBytes()
+        {
+            return _memoryStream.GetBuffer();
+        }
+
         private void WriteString(string message)
         {
             var messageLength = message.Length;

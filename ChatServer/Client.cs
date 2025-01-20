@@ -12,7 +12,6 @@ namespace ChatServer
             Id = Guid.NewGuid();
 
             _packetReader = new PacketReader(ClientSocket.GetStream());
-            _packetBuilder = new PacketBuilder(ClientSocket.GetStream());
 
             ReadUsername();
 
@@ -35,7 +34,9 @@ namespace ChatServer
 
         public void WriteMessage(Message message)
         {
-            _packetBuilder.WriteMessage(message);
+            var packetBuilder = new PacketBuilder();
+            packetBuilder.WriteMessage(message);
+            ClientSocket.Client.Send(packetBuilder.GetPacketBytes());
         }
 
         public string Username { get; set; }
@@ -43,6 +44,5 @@ namespace ChatServer
         public TcpClient ClientSocket { get; }
 
         private readonly PacketReader _packetReader;
-        private readonly PacketBuilder _packetBuilder;
     }
 }
