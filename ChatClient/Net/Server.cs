@@ -1,6 +1,5 @@
 ﻿using ChatClient.Common;
 using ChatClient.Net.IO;
-using System;
 using System.Net.Sockets;
 
 namespace ChatClient.Net
@@ -18,8 +17,10 @@ namespace ChatClient.Net
             {
                 _client.Connect("127.0.0.1", 7891);
                 _packetReader = new PacketReader(_client.GetStream());
+
                 SendInitDataPackage(username);
-                ReadPackets();
+
+                Task.Run(() => ReadPackets());
             }
         }
 
@@ -29,8 +30,8 @@ namespace ChatClient.Net
         }
 
         public void ReadPackets()
-        {
-            Task.Run(() =>
+        {            
+            try
             {
                 while (true)
                 {
@@ -38,19 +39,23 @@ namespace ChatClient.Net
                     switch (opCode)
                     {
                         case OperationCode.Message:
-                        {
-                            ReceiveMessage();
-                            break;
-                        }
+                            {
+                                ReceiveMessage();
+                                break;
+                            }
                         default:
-                        {
-                            Console.WriteLine("ERROR: wrong operation code!");
-                            break;
-                        }
+                            {
+                                Console.WriteLine("ERROR: wrong operation code!");
+                                break;
+                            }
                     }
                 }
-            });
-
+            }
+            catch
+            {
+                Console.WriteLine("Konekcija sa serverom prekinuta!");
+                Disconnect();  
+            }
         }
 
         public void ReceiveMessage()

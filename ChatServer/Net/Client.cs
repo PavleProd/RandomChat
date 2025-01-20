@@ -11,11 +11,7 @@ namespace ChatServer.Net
             ClientSocket = client;
             Id = Guid.NewGuid();
 
-            _packetReader = new PacketReader(ClientSocket.GetStream());
-
-            ReadInitData();
-
-            Console.WriteLine($"[{DateTime.Now}]: Client has connected with the username: {Username}");
+            _packetReader = new PacketReader(ClientSocket.GetStream());       
 
             Task.Run(() => ProcessPackets());
         }
@@ -30,6 +26,7 @@ namespace ChatServer.Net
             }
 
             Username = _packetReader.ReadUsername();
+            Console.WriteLine($"[{DateTime.Now}]: Client has connected with the username: {Username}");
         }
 
         public void SendMessage(Message message)
@@ -40,10 +37,12 @@ namespace ChatServer.Net
         }
 
         public void ProcessPackets()
-        {
-            while (true)
+        {            
+            try
             {
-                try
+                ReadInitData();
+
+                while (true)
                 {
                     var opCode = _packetReader.ReadOpCode();
                     switch (opCode)
@@ -58,12 +57,11 @@ namespace ChatServer.Net
                             }
                     }
                 }
-                catch
-                {
-                    Console.WriteLine($"[{Id}]: Disconnected!");
-                    ClientSocket.Close();
-                    break;
-                }
+            }
+            catch
+            {
+                Console.WriteLine($"[{Id}]: Disconnected!");
+                ClientSocket.Close();
             }
         }
 

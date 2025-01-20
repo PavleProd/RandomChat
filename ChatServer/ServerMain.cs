@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using ChatServer.Net;
+using ChatServer.Net.IO;
 
 namespace ChatServer
 {
@@ -17,6 +18,10 @@ namespace ChatServer
             {
                 var client = new Client(_listener.AcceptTcpClient());
                 _clients.Add(client);
+
+                PacketBuilder builder = new PacketBuilder();
+                builder.WriteMessage(new Common.Message("123", "Uspesno uspostavljena konekcija!"));
+                client.ClientSocket.Client.Send(builder.GetRawPacket());
 
                 // TODO:
                 // uparivanje sa drugim klijentima

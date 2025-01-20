@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using ChatClient.Common;
+using System.IO;
 using System.Text;
 
 namespace ChatClient.Net.IO
@@ -9,24 +10,30 @@ namespace ChatClient.Net.IO
         {
             _memoryStream = new MemoryStream();
         }
-
-        public void WriteOpCode(byte opcode)
+        public byte[] GetRawPacket()
         {
-            _memoryStream.WriteByte(opcode);
+            return _memoryStream.GetBuffer();
         }
 
-        public void WriteString(string message)
+        public void WriteMessage(Message message)
+        {
+            WriteOpCode(OperationCode.Message);
+            WriteString(message.AuthorId);
+            WriteString(message.Text);
+        }
+
+        private void WriteOpCode(OperationCode opcode)
+        {
+            _memoryStream.WriteByte((byte)opcode);
+        }
+
+        private void WriteString(string message)
         {
             var messageLength = message.Length;
             _memoryStream.Write(BitConverter.GetBytes(messageLength));
             _memoryStream.Write(Encoding.ASCII.GetBytes(message));
         }
 
-        public byte[] GetPacketBytes()
-        {
-            return _memoryStream.GetBuffer();
-        }
-
-        private MemoryStream _memoryStream;
+        private readonly MemoryStream _memoryStream;
     }
 }
