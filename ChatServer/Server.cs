@@ -45,8 +45,7 @@ namespace ChatServer
                     */
 
 
-                    // TODO:
-                    // uparivanje sa drugim klijentima
+                    Console.WriteLine($"Broj Klijenata: {_clients.Count}, Broj Klijenata na waitlisti: {_clientWaitlist.Count}");
                 }
             }
             catch (Exception ex)
@@ -74,20 +73,20 @@ namespace ChatServer
                 _clientWaitlist.Remove(waitlistReference);
             }
 
-            bool isLinked = _linkedClients.TryGetValue(clientId, out var linkedClientReference);
+            bool isLinked = _linkedClients.TryGetValue(clientId, out var linkedClientId);
             if (isLinked)
             {
-                _linkedClients.Remove(clientId); // remove disconnecting client
+                // remove links between clients
+                _linkedClients.Remove(clientId);
+                _linkedClients.Remove(linkedClientId);
 
                 // send message to other client that first client was disconnected
 
                 // TODO: ocekivano da je u recniku
-                var linkedClient = _clients[linkedClientReference];
-                linkedClient.SendEndLinkMessage(linkedClient.Username);
+                var linkedClient = _clients[linkedClientId];
+                linkedClient.SendEndLinkMessage(_disconnectingClient.Username);
             }
-
-            // debug
-            Console.WriteLine($"Broj Klijenata: {_clients.Count}, Broj Klijenata na waitlisti: {_clients.Count}");
+            
         }
 
         public void ForwardMessage(Guid senderId, Message message)
@@ -98,11 +97,10 @@ namespace ChatServer
             receiver.SendMessage(message);
         }
 
-
         private void LinkClients(Guid clientId1, Guid clientId2)
         {
             _linkedClients[clientId1] = clientId2;
-            _linkedClients[clientId1] = clientId2;
+            _linkedClients[clientId2] = clientId1;
 
             var client1 = _clients[clientId1];
             var client2 = _clients[clientId2];

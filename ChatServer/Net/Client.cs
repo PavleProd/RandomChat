@@ -11,8 +11,9 @@ namespace ChatServer.Net
             ClientSocket = client;
             Id = Guid.NewGuid();
 
-            _packetReader = new PacketReader(ClientSocket.GetStream());       
-
+            _packetReader = new PacketReader(ClientSocket.GetStream());
+            
+            ReadInitData();
             Task.Run(() => ProcessPackets());
         }
 
@@ -58,9 +59,7 @@ namespace ChatServer.Net
         public void ProcessPackets()
         {            
             try
-            {
-                ReadInitData();
-
+            {               
                 while (true)
                 {
                     var opCode = _packetReader.ReadOpCode();
