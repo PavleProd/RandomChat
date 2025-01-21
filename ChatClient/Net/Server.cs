@@ -6,15 +6,11 @@ namespace ChatClient.Net
 {
     class Server
     {
-        public Server()
-        {   
-            _client = new TcpClient();
-        }
-
         public void Connect(string username)
         {
             if (!IsConnected())
             {
+                _client = new TcpClient();
                 _client.Connect("127.0.0.1", 24901);
                 _packetReader = new PacketReader(_client.GetStream());
 
@@ -26,12 +22,17 @@ namespace ChatClient.Net
 
         public bool IsConnected()
         {
-            return _client.Connected;
+            return _client != null && _client.Connected;
         }
 
         public void Disconnect()
         {
-            _client.Close();
+            if (IsConnected())
+            {
+                _client.Client.Shutdown(SocketShutdown.Both);
+                _client.Client.Close();
+                _client.Close();
+            }            
         }
 
         public void ReadPackets()
@@ -83,7 +84,7 @@ namespace ChatClient.Net
 
         public event Action<Message> MessageReceived;
 
-        private TcpClient _client;
+        private TcpClient? _client;
         private PacketReader _packetReader;
     }
 }
