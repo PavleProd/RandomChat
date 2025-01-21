@@ -14,6 +14,7 @@ namespace ChatClient.Net
                 _client.Connect("127.0.0.1", 24901);
                 _packetReader = new PacketReader(_client.GetStream());
 
+                _username = username;
                 SendInitDataPacket(username);
 
                 Task.Run(() => ReadPackets());
@@ -44,7 +45,7 @@ namespace ChatClient.Net
                     var opCode = _packetReader.ReadOpCode();
                     switch (opCode)
                     {
-                        case OperationCode.Message:
+                        case OperationCode.Message or OperationCode.LinkClients or OperationCode.EndClientsLink:                        
                             {
                                 ReceiveMessage();
                                 break;
@@ -64,13 +65,21 @@ namespace ChatClient.Net
             }
         }
 
+        public void SendMessage(string messageText)
+        {
+            PacketBuilder builder = new PacketBuilder();
+            Message message = new(_username, messageText);
+            builder.WriteMessage(message);
+            SendPacket(builder);
+        }
+
         public void ReceiveMessage()
         {
             Message message = _packetReader.ReadMessage();
             MessageReceived?.Invoke(message);
         }
 
-        public void SendPacket(PacketBuilder builder)
+        private void SendPacket(PacketBuilder builder)
         {
             _client.Client.Send(builder.GetRawData());
         }            
@@ -86,5 +95,6 @@ namespace ChatClient.Net
 
         private TcpClient? _client;
         private PacketReader _packetReader;
+        private string _username;
     }
 }

@@ -2,19 +2,19 @@
 {
     readonly struct Message
     {
-        public Message(string authorId, string text)
+        public Message(string author, string text)
         {
-            AuthorId = authorId;
+            Author = author; // TODO: napravi bolje resenje umesto slanja imena svaki put
             Text = text;
             SendingTime = DateTime.Now; // TODO: sending time treba da se postavlja na now samo u porukama koje se salju
         }
 
         public override string ToString() 
         {
-            return $"[{SendingTime}] | {AuthorId}: {Text}";
+            return $"[{SendingTime}] | {Author}: {Text}";
         }
 
-        public string AuthorId { get; init; }
+        public string Author { get; init; }
         public string Text { get; init; }
         public DateTime SendingTime { get; init; }
     }

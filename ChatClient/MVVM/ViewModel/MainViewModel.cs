@@ -16,6 +16,7 @@ namespace ChatClient.MVVM.ViewModel
             _server.MessageReceived += OnMessageReceived;
             ConnectToServerCommand = new RelayCommand(o => _server.Connect(Username), o => CanConnect());
             DisconnectFromServerCommand = new RelayCommand(o => _server.Disconnect(), o => _server.IsConnected());
+            SendMessageCommand = new RelayCommand(o => _server.SendMessage(Message), o => !string.IsNullOrEmpty(Message));
         }
 
         public void OnMessageReceived(Message message)
@@ -31,7 +32,9 @@ namespace ChatClient.MVVM.ViewModel
         public ObservableCollection<string> Messages { get; set; }
         public RelayCommand ConnectToServerCommand { get; set; }
         public RelayCommand DisconnectFromServerCommand { get; set; }
+        public RelayCommand SendMessageCommand {  get; set; }
         public string Username { get; set; }
+        public string Message { get; set; }
 
         private Server _server;
     }

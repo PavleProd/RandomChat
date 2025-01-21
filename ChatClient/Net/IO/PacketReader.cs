@@ -17,10 +17,10 @@ namespace ChatClient.Net.IO
 
         public Message ReadMessage()
         {
-            string id = ReadField().ToString();
+            string author = ReadField().ToString();
             string message = ReadField().ToString();
 
-            return new Message(id, message);
+            return new Message(author, message);
         }
 
         public string ReadUsername()

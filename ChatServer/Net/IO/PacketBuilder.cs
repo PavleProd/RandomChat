@@ -17,8 +17,22 @@ namespace ChatServer.Net.IO
         public void WriteMessage(Message message)
         {
             WriteOpCode(OperationCode.Message);
-            WriteString(message.AuthorId);
+            WriteString(message.Author);
             WriteString(message.Text);
+        }
+
+        public void WriteEstablishLink(string linkedClientUsername)
+        {
+            WriteOpCode(OperationCode.LinkClients);
+            WriteString("SERVER:");
+            WriteString($"User {linkedClientUsername} has joined the chat.");
+        }
+
+        public void WriteEndLink(string linkedClientUsername)
+        {
+            WriteOpCode(OperationCode.EndClientsLink);
+            WriteString("SERVER:");
+            WriteString($"User {linkedClientUsername} has left the chat.");
         }
 
         private void WriteOpCode(OperationCode opcode)

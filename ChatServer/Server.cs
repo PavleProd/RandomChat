@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using ChatServer.Common;
 using ChatServer.Net;
 using ChatServer.Net.IO;
 
@@ -12,6 +13,7 @@ namespace ChatServer
             _clients = [];
             _clientWaitlistReferences = [];
             _clientWaitlist = [];
+            _linkedClients = [];
 
             _listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 24901);
         }
@@ -26,11 +28,22 @@ namespace ChatServer
                     var client = new Client(_listener.AcceptTcpClient());
                     _clients[client.Id] = client;
 
-                    AddClientToWaitlist(client.Id); // trenutno dodaj sve na waitlistu
+                    if (_clientWaitlist.Count > 0)
+                    {
+                        LinkClients(client.Id, TakeClientFromWaitlist());
+                    }
+                    else
+                    {
+                        AddClientToWaitlist(client.Id);
+                    }
 
-                    PacketBuilder builder = new PacketBuilder();
-                    builder.WriteMessage(new Common.Message("123", "Uspesno uspostavljena konekcija!"));
-                    client.ClientSocket.Client.Send(builder.GetRawData());
+                    /*
+                        // Test Message
+                        PacketBuilder builder = new PacketBuilder();
+                        builder.WriteMessage(new Common.Message("123", "Uspesno uspostavljena konekcija!"));
+                        client.ClientSocket.Client.Send(builder.GetRawData());
+                    */
+
 
                     // TODO:
                     // uparivanje sa drugim klijentima
@@ -53,18 +66,68 @@ namespace ChatServer
 
         public void DisconnectClient(Guid clientId)
         {
+            var _disconnectingClient = _clients[clientId];
             _clients.Remove(clientId);
-            _clientWaitlistReferences.TryGetValue(clientId, out var waitlistReference);
-            if (waitlistReference != null)
+            var inWaitlist = _clientWaitlistReferences.TryGetValue(clientId, out var waitlistReference);
+            if (inWaitlist && waitlistReference != null)
             {
                 _clientWaitlist.Remove(waitlistReference);
             }
 
+            bool isLinked = _linkedClients.TryGetValue(clientId, out var linkedClientReference);
+            if (isLinked)
+            {
+                _linkedClients.Remove(clientId); // remove disconnecting client
+
+                // send message to other client that first client was disconnected
+
+                // TODO: ocekivano da je u recniku
+                var linkedClient = _clients[linkedClientReference];
+                linkedClient.SendEndLinkMessage(linkedClient.Username);
+            }
+
+            // debug
             Console.WriteLine($"Broj Klijenata: {_clients.Count}, Broj Klijenata na waitlisti: {_clients.Count}");
+        }
+
+        public void ForwardMessage(Guid senderId, Message message)
+        {
+            var receiverId = _linkedClients[senderId];
+            var receiver = _clients[receiverId];
+
+            receiver.SendMessage(message);
+        }
+
+
+        private void LinkClients(Guid clientId1, Guid clientId2)
+        {
+            _linkedClients[clientId1] = clientId2;
+            _linkedClients[clientId1] = clientId2;
+
+            var client1 = _clients[clientId1];
+            var client2 = _clients[clientId2];
+
+            client1.SendEstablishLinkMessage(client2.Username);
+            client2.SendEstablishLinkMessage(client1.Username);
+        }
+
+        private Guid TakeClientFromWaitlist()
+        {
+            // TODO: dodaj da je obavezno da waitlista nije prazna
+
+            Guid waitingClientId = _clientWaitlist.First();
+            
+            // remove from waitlist
+            _clientWaitlistReferences.Remove(waitingClientId);
+            _clientWaitlist.RemoveFirst();
+
+            return waitingClientId;
         }        
 
         private TcpListener _listener;
         private Dictionary<Guid, Client> _clients;
+        private Dictionary<Guid, Guid> _linkedClients;
+
         private Dictionary<Guid, LinkedListNode<Guid>> _clientWaitlistReferences;
         private LinkedList<Guid> _clientWaitlist;
     }

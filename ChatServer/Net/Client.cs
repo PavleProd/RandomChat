@@ -33,6 +33,25 @@ namespace ChatServer.Net
         {
             var packetBuilder = new PacketBuilder();
             packetBuilder.WriteMessage(message);
+            SendPacket(packetBuilder);
+        }
+
+        public void SendEstablishLinkMessage(string linkedClientUsername)
+        {
+            var packetBuilder = new PacketBuilder();
+            packetBuilder.WriteEstablishLink(linkedClientUsername);
+            SendPacket(packetBuilder);
+        }
+
+        public void SendEndLinkMessage(string linkedClientUsername)
+        {
+            var packetBuilder = new PacketBuilder();
+            packetBuilder.WriteEndLink(linkedClientUsername);
+            SendPacket(packetBuilder);
+        }
+
+        private void SendPacket(PacketBuilder packetBuilder)
+        {
             ClientSocket.Client.Send(packetBuilder.GetRawData());
         }
 
@@ -54,6 +73,7 @@ namespace ChatServer.Net
                         case OperationCode.Message:
                             {
                                 Message message = _packetReader.ReadMessage();
+                                Program.RandomChat.ForwardMessage(Id, message);
                                 break;
                             }
                         default:
