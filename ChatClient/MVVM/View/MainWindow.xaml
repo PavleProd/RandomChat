@@ -5,52 +5,78 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChatClient.MVVM.ViewModel"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Height="650" Width="1200"
+        Background="#36393F"
+        AllowsTransparency="True" WindowStyle="None"
+        ResizeMode="CanResizeWithGrip">
 
     <Window.DataContext>
         <local:MainViewModel />
     </Window.DataContext>
 
-    <Border BorderThickness="1">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="0.1*"/>
-                <RowDefinition Height="0.7*"/>
-                <RowDefinition Height="0.1*"/>
-            </Grid.RowDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.04*" />
+            <RowDefinition Height="0.1*" />
+            <RowDefinition Height="0.7*" />
+            <RowDefinition Height="0.1*" />
+        </Grid.RowDefinitions>
 
-            <DockPanel Grid.Row="0">
-                <TextBox Height="25" Width="125"
-                    HorizontalAlignment="Left" Margin="25,0,0,0"
-                    Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
-               
-                <Button Height="25" Width="125"
-                HorizontalAlignment="Left"
-                Content="Connect" 
-                Command="{Binding ConnectToServerCommand}"/>
+        <Border Background="#282A2E" MouseDown="Border_MouseDown" BorderThickness="0,0,0,2" BorderBrush="#3C3F45">
+            <Grid HorizontalAlignment="Stretch">
+                <Label Content="RandomChat" Foreground="Gray" FontWeight="SemiBold" />
 
+                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal">
+                    <Button Width="26" Height="26" Content="🗕" Background="Transparent"
+                        BorderThickness="0" Foreground="Gray" FontWeight="Bold" FontSize="16"
+                            Click="ButtonMinimize_Click" />
+
+                    <Button Width="26" Height="26" Content="☐" Background="Transparent"
+                        BorderThickness="0" Foreground="Gray" FontWeight="Bold" FontSize="16"
+                            Click="ButtonMaximize_Click" />
+
+                    <Button Width="26" Height="26" Content="⨉" Background="Transparent"
+                            BorderThickness="0" Foreground="Gray" FontWeight="Bold" FontSize="16"
+                            Click="ButtonClose_Click" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" BorderThickness="0,0,0,2" BorderBrush="#3C3F45" Background="#323539">
+            <Grid HorizontalAlignment="Stretch">
+                <TextBox Height="25" Width="125" HorizontalAlignment="Center" Margin="0,0,250,0"
+                    Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" />
+                <Button Height="25" Width="125" HorizontalAlignment="Center"
+                    Content="Connect" Command="{Binding ConnectToServerCommand}" />
                 <Button Height="25" Width="125" Margin="0,0,25,0"
-                        HorizontalAlignment="Right"
-                        Content="Disconnect"
-                        Command="{Binding DisconnectFromServerCommand}" />
+                    HorizontalAlignment="Right" Content="Disconnect"
+                    Command="{Binding DisconnectFromServerCommand}" />
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" BorderThickness="0,0,0,2" BorderBrush="#3C3F45" Background="#2F3237">
+            <DockPanel>
+                <ListView ItemsSource="{Binding Messages}" Background="Transparent" BorderThickness="0" />
             </DockPanel>
+        </Border>
 
-            <StackPanel Grid.Row="1">
-                <ListView ItemsSource="{Binding Messages}"/>
-            </StackPanel>
-
-            <Grid Grid.Row="2">
+        <Border Grid.Row="3" BorderThickness="0,0,0,2" BorderBrush="#3C3F45" Background="#323539">
+            <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.8*"/>
-                    <ColumnDefinition Width="0.2*"/>
+                    <ColumnDefinition Width="0.1*" />
+                    <ColumnDefinition Width="0.5*" />
+                    <ColumnDefinition Width="0.1*" />
                 </Grid.ColumnDefinitions>
 
-                <TextBox Grid.Column="0" VerticalContentAlignment="Center"
-                         Text="{Binding Message, UpdateSourceTrigger=PropertyChanged}"/>
-                <Button Grid.Column="1" Content="Send"
-                        Command="{Binding SendMessageCommand}"/>
+                <Label Grid.Column="0" VerticalContentAlignment="Center"
+                       Content="{Binding Username, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBox Grid.Column="1" VerticalContentAlignment="Center"
+                            Text="{Binding Message, UpdateSourceTrigger=PropertyChanged}" />
+                <Button Grid.Column="2" Content="Send"
+                        Command="{Binding SendMessageCommand}" />
             </Grid>
-        </Grid>
-    </Border>
-    
+        </Border>
+    </Grid>
+
 </Window>
