@@ -20,7 +20,7 @@ namespace ChatClient.Net.IO
         {
             string message = ReadField().ToString();
             TimeOnly time = ReadField().ToTimeOnly();
-            return new Message(message, time);
+            return new Message(message, MessageType.Incoming, time);
         }
 
         public User ReadUser()

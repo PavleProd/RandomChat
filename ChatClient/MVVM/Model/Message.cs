@@ -2,12 +2,20 @@
 
 namespace ChatClient.Common
 {
+    public enum MessageType
+    {
+        Incoming,
+        Outgoing,
+        Server
+    };
+
     public class Message : INotifyPropertyChanged
     {
-        public Message(string text, TimeOnly? time = null)
+        public Message(string text, MessageType type, TimeOnly? time = null)
         {
             _text = text;
             SendingTime = time ?? TimeOnly.FromDateTime(DateTime.Now);
+            Type = type;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -17,6 +25,7 @@ namespace ChatClient.Common
         }
 
         public TimeOnly SendingTime { get; init; }
+        public MessageType? Type { get; init; }
         public string Text 
         { 
             get => _text;

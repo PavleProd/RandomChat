@@ -1,0 +1,51 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:RandomChat">
+
+    <Style x:Key="OutgoingMessageStyle" TargetType="ListViewItem">
+        <Setter Property="HorizontalContentAlignment" Value="Right"/>
+        <Setter Property="Padding" Value="5"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListViewItem">
+                    <Border CornerRadius="10" Background="#ADD8E6" Padding="10" Margin="5" Width="300" HorizontalAlignment="Right">
+                        <ContentPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="IncomingMessageStyle" TargetType="ListViewItem">
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="Padding" Value="5"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListViewItem">
+                    <Border CornerRadius="10" Background="#E5E5E5" Padding="10" Margin="5" Width="300" HorizontalAlignment="Left">
+                        <ContentPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ServerMessageStyle" TargetType="ListViewItem">
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Padding" Value="5"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListViewItem">
+                    <Border CornerRadius="10" Background="#FFD700" Padding="10" Margin="5" Width="400">
+                        <ContentPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <local:MessageStyleSelector x:Key="MessageStyleSelector"
+                                OutgoingMessageStyle="{StaticResource OutgoingMessageStyle}"
+                                IncomingMessageStyle="{StaticResource IncomingMessageStyle}"
+                                ServerMessageStyle="{StaticResource ServerMessageStyle}" />
+</ResourceDictionary>

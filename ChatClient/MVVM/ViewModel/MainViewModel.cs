@@ -16,7 +16,7 @@ namespace ChatClient.MVVM.ViewModel
             Messages = [];
 
             UserData = new User(String.Empty);
-            TypedMessage = new Message(String.Empty);
+            TypedMessage = new Message(String.Empty, MessageType.Outgoing);
 
             SubscribeToEvents();
             InitCommands();
@@ -37,13 +37,19 @@ namespace ChatClient.MVVM.ViewModel
         public void OnChatStarted(User connectedUser)
         {
             ConnectedUser = connectedUser;
-            AddMessage(new Message($"User {ConnectedUser.Username} has joined the chat!"));
+            AddServerMessage($"User {ConnectedUser.Username} has joined the chat!");
         }
 
         public void OnChatEnded()
         {
-            AddMessage(new Message($"User {ConnectedUser.Username} has left the chat!"));
+            AddServerMessage($"User {ConnectedUser.Username} has left the chat!");
             ConnectedUser = null;
+        }
+
+        private void AddServerMessage(string text)
+        {
+            Message serverMessage = new(text, MessageType.Server);
+            AddMessage(serverMessage);
         }
 
         private void InitCommands()
@@ -59,13 +65,19 @@ namespace ChatClient.MVVM.ViewModel
 
         private void SendMessage()
         {
-            _server.SendMessage(TypedMessage);
+            Message message = new Message(TypedMessage.Text, MessageType.Outgoing);
+            _server.SendMessage(message);
+            AddMessage(message);
+
             TypedMessage.Text = string.Empty;
         }
 
         private void AddMessage(Message message)
         {
-            Application.Current.Dispatcher.Invoke(() => Messages.Add(message));
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Messages.Add(message);
+            });
         }
 
         public RelayCommand ConnectToServerCommand { get; set; }

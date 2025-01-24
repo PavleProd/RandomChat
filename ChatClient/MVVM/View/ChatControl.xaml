@@ -23,17 +23,14 @@
             </Grid>
         </Border>
 
-        <Border Grid.Row="1" BorderThickness="0,0,0,2" BorderBrush="#3C3F45" Background="#2F3237">
-            <DockPanel>
-                <ListView ItemsSource="{Binding Messages }" Background="Transparent" BorderThickness="0">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Text}"/>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </DockPanel>
-        </Border>
+        <ListView Grid.Row="1"  ItemsSource="{Binding Messages}" Background="Transparent" BorderThickness="0"
+          ItemContainerStyleSelector="{StaticResource MessageStyleSelector}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Foreground="Black"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
 
         <Border Grid.Row="2" BorderThickness="0,0,0,2" BorderBrush="#3C3F45" Background="#323539">
             <Grid>

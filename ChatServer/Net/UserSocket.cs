@@ -81,9 +81,8 @@ namespace ChatServer.Net
                     }
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine(ex.ToString()); // TODO: ispisi samo za moje errore, ne za prekid konekcije
                 Console.WriteLine($"[{Id}]: Disconnected!");
 
                 Program.RandomChat.DisconnectUser(Id);
