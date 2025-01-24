@@ -2,12 +2,13 @@
 using ChatClient.MVVM.Core;
 using ChatClient.MVVM.Model;
 using ChatClient.Net;
+using RandomChat;
 using System.Collections.ObjectModel;
 using System.Windows;
 
 namespace ChatClient.MVVM.ViewModel
 {
-    class MainViewModel
+    public class MainViewModel
     {
         public MainViewModel()
         {
@@ -25,16 +26,24 @@ namespace ChatClient.MVVM.ViewModel
         {
             _server.MessageReceived += OnMessageReceived;
             _server.ChatStarted += OnChatStarted;
+            _server.ChatEnded += OnChatEnded;
         }
 
         public void OnMessageReceived(Message message)
         {
-            Application.Current.Dispatcher.Invoke(() => Messages.Add(message));
+            AddMessage(message);
         }
 
         public void OnChatStarted(User connectedUser)
         {
             ConnectedUser = connectedUser;
+            AddMessage(new Message($"User {ConnectedUser.Username} has joined the chat!"));
+        }
+
+        public void OnChatEnded()
+        {
+            AddMessage(new Message($"User {ConnectedUser.Username} has left the chat!"));
+            ConnectedUser = null;
         }
 
         private void InitCommands()
@@ -52,6 +61,11 @@ namespace ChatClient.MVVM.ViewModel
         {
             _server.SendMessage(TypedMessage);
             TypedMessage.Text = string.Empty;
+        }
+
+        private void AddMessage(Message message)
+        {
+            Application.Current.Dispatcher.Invoke(() => Messages.Add(message));
         }
 
         public RelayCommand ConnectToServerCommand { get; set; }

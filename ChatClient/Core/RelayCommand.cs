@@ -2,7 +2,7 @@
 
 namespace ChatClient.MVVM.Core
 {
-    class RelayCommand : ICommand
+    public class RelayCommand : ICommand
     {
         public RelayCommand(Action<object> execute, Func<object, bool>? canExecute = null)
         {

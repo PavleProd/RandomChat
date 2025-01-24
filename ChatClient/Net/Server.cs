@@ -1,8 +1,10 @@
 ﻿using ChatClient.Common;
 using ChatClient.MVVM.Model;
 using ChatClient.Net.IO;
+using RandomChat;
 using System.Diagnostics;
 using System.Net.Sockets;
+using System.Windows;
 
 namespace ChatClient.Net
 {
@@ -12,13 +14,14 @@ namespace ChatClient.Net
         {
             if (!IsConnected())
             {
+                
                 _socket = new TcpClient();
                 _socket.Connect("127.0.0.1", 24901);
                 _packetReader = new PacketReader(_socket.GetStream());
 
                 _userData = user;
                 SendInitDataPacket();
-
+                
                 Task.Run(() => ReadPackets());
             }
         }
@@ -49,6 +52,12 @@ namespace ChatClient.Net
                     {
                         case OperationCode.StartChat:
                             {
+                                Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    var mainWindow = (MainWindow)Application.Current.MainWindow;
+                                    mainWindow.ToChatPage();
+                                });
+                                
                                 User connectedUser = _packetReader.ReadUser();
                                 ChatStarted?.Invoke(connectedUser);
                                 break;
@@ -61,7 +70,7 @@ namespace ChatClient.Net
                             }
                         case OperationCode.EndChat:
                             {
-                                ChatEndeed?.Invoke();
+                                ChatEnded?.Invoke();
                                 Disconnect();
                                 break;
                             }
@@ -106,7 +115,7 @@ namespace ChatClient.Net
 
         public event Action<Message>? MessageReceived;
         public event Action<User>? ChatStarted;
-        public event Action? ChatEndeed;
+        public event Action? ChatEnded;
 
         private TcpClient? _socket;
         private PacketReader? _packetReader;

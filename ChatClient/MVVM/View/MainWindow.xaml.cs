@@ -1,16 +1,29 @@
-﻿using System.Windows;
+﻿using ChatClient.MVVM.View;
+using System.Windows;
 using System.Windows.Input;
 
 namespace RandomChat
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
+
+            _mainMenuControl = new MainMenuControl();
+            _chatControl = new ChatControl();
+
+            ToMainMenuPage();
+        }
+
+        public void ToMainMenuPage()
+        {
+            PageSource.Content = _mainMenuControl;
+        }
+
+        public void ToChatPage()
+        {
+            PageSource.Content = _chatControl;
         }
 
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
@@ -43,5 +56,7 @@ namespace RandomChat
             Application.Current.Shutdown();
         }
 
+        private MainMenuControl _mainMenuControl;
+        private ChatControl _chatControl;
     }
 }

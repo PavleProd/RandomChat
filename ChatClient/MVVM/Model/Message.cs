@@ -2,7 +2,7 @@
 
 namespace ChatClient.Common
 {
-    class Message : INotifyPropertyChanged
+    public class Message : INotifyPropertyChanged
     {
         public Message(string text, TimeOnly? time = null)
         {
