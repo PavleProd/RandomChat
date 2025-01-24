@@ -1,4 +1,5 @@
 ﻿using ChatClient.Common;
+using ChatClient.MVVM.Model;
 using ChatClient.Net.IO;
 using System.Net.Sockets;
 
@@ -6,7 +7,7 @@ namespace ChatClient.Net
 {
     class Server
     {
-        public void Connect(string username)
+        public void Connect(User user)
         {
             if (!IsConnected())
             {
@@ -14,8 +15,8 @@ namespace ChatClient.Net
                 _client.Connect("127.0.0.1", 24901);
                 _packetReader = new PacketReader(_client.GetStream());
 
-                _username = username;
-                SendInitDataPacket(username);
+                _userData = user;
+                SendInitDataPacket();
 
                 Task.Run(() => ReadPackets());
             }
@@ -45,9 +46,18 @@ namespace ChatClient.Net
                     var opCode = _packetReader.ReadOpCode();
                     switch (opCode)
                     {
-                        case OperationCode.Message or OperationCode.LinkClients or OperationCode.EndClientsLink:                        
+                        case OperationCode.LinkClients:
+                            {
+                                break;
+                            }
+                        case OperationCode.Message:                        
                             {
                                 ReceiveMessage();
+                                break;
+                            }
+                        case OperationCode.EndClientsLink:
+                            {
+                                Disconnect();
                                 break;
                             }
                         default:
@@ -65,10 +75,9 @@ namespace ChatClient.Net
             }
         }
 
-        public void SendMessage(string messageText)
+        public void SendMessage(Message message)
         {
             PacketBuilder builder = new PacketBuilder();
-            Message message = new(_username, messageText);
             builder.WriteMessage(message);
             SendPacket(builder);
         }
@@ -81,13 +90,16 @@ namespace ChatClient.Net
 
         private void SendPacket(PacketBuilder builder)
         {
-            _client.Client.Send(builder.GetRawData());
+            if (IsConnected())
+            {
+                _client.Client.Send(builder.GetRawData());
+            }
         }            
 
-        private void SendInitDataPacket(string username)
+        private void SendInitDataPacket()
         {
             var packetBuilder = new PacketBuilder();
-            packetBuilder.WriteInitData(username);
+            packetBuilder.WriteInitData(_userData);
             SendPacket(packetBuilder);
         }
 
@@ -95,6 +107,6 @@ namespace ChatClient.Net
 
         private TcpClient? _client;
         private PacketReader _packetReader;
-        private string _username;
+        private User _userData;
     }
 }

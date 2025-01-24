@@ -1,8 +1,8 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
-using ChatServer.Common;
+using ChatServer.Model;
 using ChatServer.Net;
-using ChatServer.Net.IO;
 
 namespace ChatServer
 {
@@ -10,10 +10,10 @@ namespace ChatServer
     {
         public Server()
         {
-            _clients = [];
-            _clientWaitlistReferences = [];
-            _clientWaitlist = [];
-            _linkedClients = [];
+            _users = [];
+            _userWaitlistMap = [];
+            _userWaitlist = [];
+            _userConversationMap = [];
 
             _listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 24901);
         }
@@ -25,27 +25,31 @@ namespace ChatServer
 
                 while (true)
                 {
-                    var client = new Client(_listener.AcceptTcpClient());
-                    _clients[client.Id] = client;
-
-                    if (_clientWaitlist.Count > 0)
+                    UserSocket userSocket;
+                    try
                     {
-                        LinkClients(client.Id, TakeClientFromWaitlist());
+                        userSocket = new UserSocket(_listener.AcceptTcpClient());
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                    
+                    Task.Run(() => userSocket.ProcessPackets());
+
+                    _users[userSocket.Id] = userSocket;
+
+                    if (_userWaitlist.Count > 0)
+                    {
+                        StartChat(userSocket.Id, TakeUserFromWaitlist());
                     }
                     else
                     {
-                        AddClientToWaitlist(client.Id);
+                        AddClientToWaitlist(userSocket.Id);
                     }
 
-                    /*
-                        // Test Message
-                        PacketBuilder builder = new PacketBuilder();
-                        builder.WriteMessage(new Common.Message("123", "Uspesno uspostavljena konekcija!"));
-                        client.ClientSocket.Client.Send(builder.GetRawData());
-                    */
 
-
-                    Console.WriteLine($"Broj Klijenata: {_clients.Count}, Broj Klijenata na waitlisti: {_clientWaitlist.Count}");
+                    Console.WriteLine($"Broj Klijenata: {_users.Count}, Broj Klijenata na waitlisti: {_userWaitlist.Count}");
                 }
             }
             catch (Exception ex)
@@ -57,76 +61,72 @@ namespace ChatServer
 
         public void AddClientToWaitlist(Guid clientId)
         {
-            // TODO dodaj logiku za proveru da li je vec na listi cekanja
-
-            var waitlistReference = _clientWaitlist.AddLast(clientId);
-            _clientWaitlistReferences[clientId] = waitlistReference;
+            var waitlistReference = _userWaitlist.AddLast(clientId);
+            _userWaitlistMap[clientId] = waitlistReference;
         }
 
-        public void DisconnectClient(Guid clientId)
+        public void DisconnectUser(Guid userId)
         {
-            var _disconnectingClient = _clients[clientId];
-            _clients.Remove(clientId);
-            var inWaitlist = _clientWaitlistReferences.TryGetValue(clientId, out var waitlistReference);
+            _users.Remove(userId);
+
+            var inWaitlist = _userWaitlistMap.TryGetValue(userId, out var waitlistReference);
             if (inWaitlist && waitlistReference != null)
             {
-                _clientWaitlist.Remove(waitlistReference);
+                _userWaitlist.Remove(waitlistReference);
             }
 
-            bool isLinked = _linkedClients.TryGetValue(clientId, out var linkedClientId);
+            bool isLinked = _userConversationMap.TryGetValue(userId, out var connectedUserId);
             if (isLinked)
             {
-                // remove links between clients
-                _linkedClients.Remove(clientId);
-                _linkedClients.Remove(linkedClientId);
+                _userConversationMap.Remove(userId);
+                _userConversationMap.Remove(connectedUserId);
 
-                // send message to other client that first client was disconnected
-
-                // TODO: ocekivano da je u recniku
-                var linkedClient = _clients[linkedClientId];
-                linkedClient.SendEndLinkMessage(_disconnectingClient.Username);
+                // send end chat signal to connected user
+                Debug.Assert(_users.ContainsKey(connectedUserId), "Connected user is not in user collection!");
+                var connectedUser = _users[connectedUserId];
+                connectedUser.SendEndChat();
             }
             
         }
 
         public void ForwardMessage(Guid senderId, Message message)
         {
-            var receiverId = _linkedClients[senderId];
-            var receiver = _clients[receiverId];
+            var receiverId = _userConversationMap[senderId];
+            var receiver = _users[receiverId];
 
             receiver.SendMessage(message);
         }
 
-        private void LinkClients(Guid clientId1, Guid clientId2)
+        private void StartChat(Guid clientId1, Guid clientId2)
         {
-            _linkedClients[clientId1] = clientId2;
-            _linkedClients[clientId2] = clientId1;
+            _userConversationMap[clientId1] = clientId2;
+            _userConversationMap[clientId2] = clientId1;
 
-            var client1 = _clients[clientId1];
-            var client2 = _clients[clientId2];
+            var client1 = _users[clientId1];
+            var client2 = _users[clientId2];
 
-            client1.SendEstablishLinkMessage(client2.Username);
-            client2.SendEstablishLinkMessage(client1.Username);
+            client1.SendStartChat(client2.userData);
+            client2.SendStartChat(client1.userData);
         }
 
-        private Guid TakeClientFromWaitlist()
+        private Guid TakeUserFromWaitlist()
         {
-            // TODO: dodaj da je obavezno da waitlista nije prazna
+            Debug.Assert(_userWaitlist.Count > 0);
 
-            Guid waitingClientId = _clientWaitlist.First();
+            Guid waitingClientId = _userWaitlist.First();
             
             // remove from waitlist
-            _clientWaitlistReferences.Remove(waitingClientId);
-            _clientWaitlist.RemoveFirst();
+            _userWaitlistMap.Remove(waitingClientId);
+            _userWaitlist.RemoveFirst();
 
             return waitingClientId;
         }        
 
         private TcpListener _listener;
-        private Dictionary<Guid, Client> _clients;
-        private Dictionary<Guid, Guid> _linkedClients;
+        private Dictionary<Guid, UserSocket> _users;
+        private Dictionary<Guid, Guid> _userConversationMap;
 
-        private Dictionary<Guid, LinkedListNode<Guid>> _clientWaitlistReferences;
-        private LinkedList<Guid> _clientWaitlist;
+        private Dictionary<Guid, LinkedListNode<Guid>> _userWaitlistMap;
+        private LinkedList<Guid> _userWaitlist;
     }
 }

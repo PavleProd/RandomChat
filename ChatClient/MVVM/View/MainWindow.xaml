@@ -45,7 +45,7 @@
         <Border Grid.Row="1" BorderThickness="0,0,0,2" BorderBrush="#3C3F45" Background="#323539">
             <Grid HorizontalAlignment="Stretch">
                 <TextBox Height="25" Width="125" HorizontalAlignment="Center" Margin="0,0,250,0"
-                    Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" />
+                    Text="{Binding UserData.Username, UpdateSourceTrigger=PropertyChanged}" />
                 <Button Height="25" Width="125" HorizontalAlignment="Center"
                     Content="Connect" Command="{Binding ConnectToServerCommand}" />
                 <Button Height="25" Width="125" Margin="0,0,25,0"
@@ -56,7 +56,13 @@
 
         <Border Grid.Row="2" BorderThickness="0,0,0,2" BorderBrush="#3C3F45" Background="#2F3237">
             <DockPanel>
-                <ListView ItemsSource="{Binding Messages}" Background="Transparent" BorderThickness="0" />
+                <ListView ItemsSource="{Binding Messages }" Background="Transparent" BorderThickness="0">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Text}"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </DockPanel>
         </Border>
 
@@ -69,10 +75,10 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Column="0" VerticalContentAlignment="Center"
-                       Content="{Binding Username, UpdateSourceTrigger=PropertyChanged}" />
+                       Content="{Binding UserData.Username, UpdateSourceTrigger=PropertyChanged}" />
 
                 <TextBox Grid.Column="1" VerticalContentAlignment="Center"
-                            Text="{Binding Message, UpdateSourceTrigger=PropertyChanged}" />
+                            Text="{Binding TypedMessage.Text, UpdateSourceTrigger=PropertyChanged}" />
                 <Button Grid.Column="2" Content="Send"
                         Command="{Binding SendMessageCommand}" />
             </Grid>

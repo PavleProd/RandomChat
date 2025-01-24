@@ -1,33 +1,32 @@
 ﻿using ChatServer.Common;
+using ChatServer.Model;
 using ChatServer.Net.IO;
 using System.Net.Sockets;
 
 namespace ChatServer.Net
 {
-    class Client
+    class UserSocket
     {
-        public Client(TcpClient client)
+        public UserSocket(TcpClient socket)
         {
-            ClientSocket = client;
+            Socket = socket;
             Id = Guid.NewGuid();
 
-            _packetReader = new PacketReader(ClientSocket.GetStream());
-            
-            ReadInitData();
-            Task.Run(() => ProcessPackets());
+            _packetReader = new PacketReader(Socket.GetStream());
+            LoadInitData();
         }
 
-        public void ReadInitData()
+        public void LoadInitData()
         {
             var opCode = _packetReader.ReadOpCode();
 
             if (opCode != OperationCode.InitData)
             {
-                throw new Exception("INVALID OPERATION CODE");
+                throw new Exception();
             }
 
-            Username = _packetReader.ReadUsername();
-            Console.WriteLine($"[{DateTime.Now}]: Client has connected with the username: {Username}");
+            userData = _packetReader.ReadUser();
+            Console.WriteLine($"[{DateTime.Now}]: Client has connected with the username: {userData.Username}");
         }
 
         public void SendMessage(Message message)
@@ -37,23 +36,23 @@ namespace ChatServer.Net
             SendPacket(packetBuilder);
         }
 
-        public void SendEstablishLinkMessage(string linkedClientUsername)
+        public void SendStartChat(User user)
         {
             var packetBuilder = new PacketBuilder();
-            packetBuilder.WriteEstablishLink(linkedClientUsername);
+            packetBuilder.WriteStartChat(user);
             SendPacket(packetBuilder);
         }
 
-        public void SendEndLinkMessage(string linkedClientUsername)
+        public void SendEndChat()
         {
             var packetBuilder = new PacketBuilder();
-            packetBuilder.WriteEndLink(linkedClientUsername);
+            packetBuilder.WriteEndChat();
             SendPacket(packetBuilder);
         }
 
         private void SendPacket(PacketBuilder packetBuilder)
         {
-            ClientSocket.Client.Send(packetBuilder.GetRawData());
+            Socket.Client.Send(packetBuilder.GetRawData());
         }
 
         public void ProcessPackets()
@@ -87,14 +86,15 @@ namespace ChatServer.Net
                 Console.WriteLine(ex.ToString()); // TODO: ispisi samo za moje errore, ne za prekid konekcije
                 Console.WriteLine($"[{Id}]: Disconnected!");
 
-                Program.RandomChat.DisconnectClient(Id);
-                ClientSocket.Close();
+                Program.RandomChat.DisconnectUser(Id);
+                Socket.Close();
             }
         }
 
-        public string? Username { get; set; }
         public Guid Id { get; }
-        public TcpClient ClientSocket { get; }
+        public TcpClient Socket { get; }
+
+        public User userData { get; private set;  }
 
         private readonly PacketReader _packetReader;
     }

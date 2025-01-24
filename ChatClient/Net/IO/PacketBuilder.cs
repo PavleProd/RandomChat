@@ -1,4 +1,5 @@
 ﻿using ChatClient.Common;
+using ChatClient.MVVM.Model;
 using System.IO;
 using System.Text;
 
@@ -18,14 +19,14 @@ namespace ChatClient.Net.IO
         public void WriteMessage(Message message)
         {
             WriteOpCode(OperationCode.Message);
-            WriteString(message.AuthorId);
             WriteString(message.Text);
+            WriteTime(message.SendingTime);
         }
 
-        public void WriteInitData(string username)
+        public void WriteInitData(User user)
         {
             WriteOpCode(OperationCode.InitData);
-            WriteString(username);
+            WriteString(user.Username);
         }
 
         private void WriteOpCode(OperationCode opcode)
@@ -38,6 +39,11 @@ namespace ChatClient.Net.IO
             var messageLength = message.Length;
             _memoryStream.Write(BitConverter.GetBytes(messageLength));
             _memoryStream.Write(Encoding.ASCII.GetBytes(message));
+        }
+
+        private void WriteTime(TimeOnly time)
+        {
+            WriteString(time.ToString());
         }
 
         private readonly MemoryStream _memoryStream;

@@ -1,4 +1,5 @@
 ﻿using ChatClient.Common;
+using ChatClient.MVVM.Model;
 using System.IO;
 using System.Net.Sockets;
 
@@ -17,15 +18,14 @@ namespace ChatClient.Net.IO
 
         public Message ReadMessage()
         {
-            string author = ReadField().ToString();
             string message = ReadField().ToString();
-
-            return new Message(author, message);
+            TimeOnly time = ReadField().ToTimeOnly();
+            return new Message(message, time);
         }
 
-        public string ReadUsername()
+        public User ReadUser()
         {
-            return ReadField().ToString();
+            return new User(ReadField().ToString());
         }
 
         private PacketField ReadField()

@@ -4,9 +4,9 @@
     {
         None,
         InitData,
-        LinkClients,
+        StartChat,
         Message,
-        EndClientsLink,
+        EndChat,
         Invalid
     }
 }

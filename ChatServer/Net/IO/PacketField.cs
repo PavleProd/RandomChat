@@ -18,6 +18,11 @@ namespace ChatServer.Net.IO
             return Encoding.ASCII.GetString(_data);
         }
 
+        public TimeOnly ToTimeOnly()
+        {
+            return TimeOnly.Parse(ToString());
+        }
+
         private readonly byte[] _data;
     }
 }

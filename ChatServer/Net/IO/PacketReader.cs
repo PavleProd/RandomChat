@@ -1,4 +1,6 @@
 ﻿using ChatServer.Common;
+using ChatServer.Model;
+using System.IO;
 using System.Net.Sockets;
 
 namespace ChatServer.Net.IO
@@ -16,15 +18,15 @@ namespace ChatServer.Net.IO
 
         public Message ReadMessage()
         {
-            string id = ReadField().ToString();
             string message = ReadField().ToString();
-
-            return new Message(id, message);
+            TimeOnly time = ReadField().ToTimeOnly();
+            return new Message(message, time);
         }
 
-        public string ReadUsername()
+        public User ReadUser()
         {
-            return ReadField().ToString();
+            string username = ReadField().ToString();
+            return new User(username);
         }
 
         private PacketField ReadField()
