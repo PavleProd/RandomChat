@@ -1,6 +1,7 @@
 ﻿using ChatClient.Common;
 using ChatClient.MVVM.Model;
 using ChatClient.Net.IO;
+using System.Diagnostics;
 using System.Net.Sockets;
 
 namespace ChatClient.Net
@@ -11,9 +12,9 @@ namespace ChatClient.Net
         {
             if (!IsConnected())
             {
-                _client = new TcpClient();
-                _client.Connect("127.0.0.1", 24901);
-                _packetReader = new PacketReader(_client.GetStream());
+                _socket = new TcpClient();
+                _socket.Connect("127.0.0.1", 24901);
+                _packetReader = new PacketReader(_socket.GetStream());
 
                 _userData = user;
                 SendInitDataPacket();
@@ -24,16 +25,16 @@ namespace ChatClient.Net
 
         public bool IsConnected()
         {
-            return _client != null && _client.Connected;
+            return _socket != null && _socket.Connected;
         }
 
         public void Disconnect()
         {
             if (IsConnected())
             {
-                _client.Client.Shutdown(SocketShutdown.Both);
-                _client.Client.Close();
-                _client.Close();
+                _socket.Client.Shutdown(SocketShutdown.Both);
+                _socket.Client.Close();
+                _socket.Close();
             }            
         }
 
@@ -46,17 +47,21 @@ namespace ChatClient.Net
                     var opCode = _packetReader.ReadOpCode();
                     switch (opCode)
                     {
-                        case OperationCode.LinkClients:
+                        case OperationCode.StartChat:
                             {
+                                User connectedUser = _packetReader.ReadUser();
+                                ChatStarted?.Invoke(connectedUser);
                                 break;
                             }
                         case OperationCode.Message:                        
                             {
-                                ReceiveMessage();
+                                Message message = _packetReader.ReadMessage();
+                                MessageReceived?.Invoke(message);
                                 break;
                             }
-                        case OperationCode.EndClientsLink:
+                        case OperationCode.EndChat:
                             {
+                                ChatEndeed?.Invoke();
                                 Disconnect();
                                 break;
                             }
@@ -82,31 +87,29 @@ namespace ChatClient.Net
             SendPacket(builder);
         }
 
-        public void ReceiveMessage()
-        {
-            Message message = _packetReader.ReadMessage();
-            MessageReceived?.Invoke(message);
-        }
-
         private void SendPacket(PacketBuilder builder)
         {
             if (IsConnected())
             {
-                _client.Client.Send(builder.GetRawData());
+                _socket.Client.Send(builder.GetRawData());
             }
         }            
 
         private void SendInitDataPacket()
         {
+            Debug.Assert(_userData != null);
+
             var packetBuilder = new PacketBuilder();
             packetBuilder.WriteInitData(_userData);
             SendPacket(packetBuilder);
         }
 
-        public event Action<Message> MessageReceived;
+        public event Action<Message>? MessageReceived;
+        public event Action<User>? ChatStarted;
+        public event Action? ChatEndeed;
 
-        private TcpClient? _client;
-        private PacketReader _packetReader;
-        private User _userData;
+        private TcpClient? _socket;
+        private PacketReader? _packetReader;
+        private User? _userData;
     }
 }

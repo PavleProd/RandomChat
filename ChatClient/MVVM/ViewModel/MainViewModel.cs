@@ -17,10 +17,14 @@ namespace ChatClient.MVVM.ViewModel
             UserData = new User(String.Empty);
             TypedMessage = new Message(String.Empty);
 
+            SubscribeToEvents();
+            InitCommands();
+        }
+
+        private void SubscribeToEvents()
+        {
             _server.MessageReceived += OnMessageReceived;
-            ConnectToServerCommand = new RelayCommand(o => _server.Connect(UserData), o => !_server.IsConnected());
-            DisconnectFromServerCommand = new RelayCommand(o => _server.Disconnect(), o => _server.IsConnected());
-            SendMessageCommand = new RelayCommand(o => SendMessage(), o => !string.IsNullOrEmpty(TypedMessage.Text));
+            _server.ChatStarted += OnChatStarted;
         }
 
         public void OnMessageReceived(Message message)
@@ -28,16 +32,27 @@ namespace ChatClient.MVVM.ViewModel
             Application.Current.Dispatcher.Invoke(() => Messages.Add(message));
         }
 
-        public bool CanConnect()
+        public void OnChatStarted(User connectedUser)
+        {
+            ConnectedUser = connectedUser;
+        }
+
+        private void InitCommands()
+        {
+            ConnectToServerCommand = new RelayCommand(o => _server.Connect(UserData), o => CanConnect());
+            DisconnectFromServerCommand = new RelayCommand(o => _server.Disconnect(), o => _server.IsConnected());
+            SendMessageCommand = new RelayCommand(o => SendMessage(), o => !string.IsNullOrEmpty(TypedMessage.Text));
+        }
+        private bool CanConnect()
         {
             return !_server.IsConnected() && !string.IsNullOrEmpty(UserData.Username);
         }
 
-        public void SendMessage()
-        {            
+        private void SendMessage()
+        {
             _server.SendMessage(TypedMessage);
             TypedMessage.Text = string.Empty;
-        } 
+        }
 
         public RelayCommand ConnectToServerCommand { get; set; }
         public RelayCommand DisconnectFromServerCommand { get; set; }
@@ -47,6 +62,7 @@ namespace ChatClient.MVVM.ViewModel
 
         public Message TypedMessage { get; set; }
         public User UserData { get; set; }
+        public User? ConnectedUser { get; set; }
 
         private readonly Server _server;
     }
