@@ -15,6 +15,7 @@ namespace ChatClient.MVVM.ViewModel
             _server = new Server();
             Messages = [];
 
+            ConnectedUser = new User(String.Empty);
             UserData = new User(String.Empty);
             TypedMessage = new Message(String.Empty, MessageType.Outgoing);
 
@@ -36,14 +37,13 @@ namespace ChatClient.MVVM.ViewModel
 
         public void OnChatStarted(User connectedUser)
         {
-            ConnectedUser = connectedUser;
+            ConnectedUser.Username = connectedUser.Username;
             AddServerMessage($"User {ConnectedUser.Username} has joined the chat!");
         }
 
         public void OnChatEnded()
         {
             AddServerMessage($"User {ConnectedUser.Username} has left the chat!");
-            ConnectedUser = null;
         }
 
         private void AddServerMessage(string text)
@@ -88,7 +88,7 @@ namespace ChatClient.MVVM.ViewModel
 
         public Message TypedMessage { get; set; }
         public User UserData { get; set; }
-        public User? ConnectedUser { get; set; }
+        public User ConnectedUser { get; set; }
 
         private readonly Server _server;
     }

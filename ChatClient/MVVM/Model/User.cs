@@ -6,11 +6,11 @@ namespace ChatClient.MVVM.Model
     {
         public User(string username)
         {
-            Username = username;
+            _username = username;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged(string propertyName)
+        public void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
