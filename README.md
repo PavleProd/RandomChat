@@ -3,6 +3,7 @@
 Random Chat is a desktop application where users can find friends and make connections by talking to other online users.
 Users can count on anonymity since messages aren't stored on the web server and they don't have to create a profile to communicate.
 
+Chatting Screen Style:
 ![image](https://github.com/user-attachments/assets/4238a6ac-8b8a-43e7-9a9d-74267f4a9096)
 
 ## Tech Stack
