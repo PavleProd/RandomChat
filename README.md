@@ -3,9 +3,6 @@
 Random Chat is a desktop application where users can find friends and make connections by talking to other online users.
 Users can count on anonymity since messages aren't stored on the web server and they don't have to create a profile to communicate.
 
-Chatting Screen Style:
-![image](https://github.com/user-attachments/assets/4238a6ac-8b8a-43e7-9a9d-74267f4a9096)
-
 ## Tech Stack
 
 - .NET 8.0
@@ -17,3 +14,11 @@ Chatting Screen Style:
 - Users send TCP packets to a web server to establish a connection and exchange messages
 - Web Server pairs them with another user on the waitlist and keeps that connection open
 - Messages from one user are just forwarded to the paired user and they exist while chat between them exists
+
+## Frontend:
+
+- Uses MVVM design pattern
+- Intuitive, modern design
+
+Client Chatting Screen:
+![image](https://github.com/user-attachments/assets/038c1681-c35b-4023-bed9-8fb7769086fd)
