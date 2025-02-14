@@ -8,46 +8,56 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.1*" />
+            <RowDefinition Height="0.15*" />
             <RowDefinition Height="0.7*" />
-            <RowDefinition Height="0.1*" />
+            <RowDefinition Height="0.15*" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" BorderThickness="0,0,0,2" BorderBrush="#3C3F45" Background="#323539">
+        <Border Grid.Row="0" BorderThickness="0,0,0,2" BorderBrush="#3C3F45" Background="#323539" Padding="10">
             <Grid HorizontalAlignment="Stretch">
-                <Label VerticalContentAlignment="Center" Style="{StaticResource DarkBackgroundTextStyle}"
-                    Content="{Binding ConnectedUser.Username, UpdateSourceTrigger=PropertyChanged}" />
+                <Label Style="{StaticResource DarkBackgroundTextStyle}">
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                        <TextBlock Text="Chatting With:"/>
+                        <TextBlock Text="{Binding ConnectedUser.Username, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </StackPanel>
+                </Label>
 
-                <Button Height="25" Width="125" Margin="0,0,25,0"
-                    HorizontalAlignment="Right" Content="Disconnect"
-                    Command="{Binding DisconnectFromServerCommand}" />
+                <Button Content="Disconnect"
+                        Command="{Binding DisconnectFromServerCommand}"
+                        Style="{StaticResource DisconnectButtonStyle}" />
             </Grid>
         </Border>
 
-        <ListView Grid.Row="1"  ItemsSource="{Binding Messages}" Background="Transparent" BorderThickness="0"
-          ItemContainerStyleSelector="{StaticResource MessageStyleSelector}">
+        <ListView Grid.Row="1" ItemsSource="{Binding Messages}" Background="Transparent" BorderThickness="0"
+                  ItemContainerStyleSelector="{StaticResource MessageStyleSelector}">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Text}" Style="{StaticResource ModernTextStyle}"/>
+                    <TextBlock Text="{Binding Text}" Style="{StaticResource ModernTextStyle}" TextWrapping="Wrap"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
 
-        <Border Grid.Row="2" BorderThickness="0,0,0,2" BorderBrush="#3C3F45" Background="#323539">
+        <Border Grid.Row="2" BorderThickness="0,0,0,2" BorderBrush="#3C3F45" Background="#323539" Padding="10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="0.1*" />
-                    <ColumnDefinition Width="0.5*" />
-                    <ColumnDefinition Width="0.1*" />
+                    <ColumnDefinition Width="0.7*" />
+                    <ColumnDefinition Width="0.2*" />
                 </Grid.ColumnDefinitions>
 
-                <Label Grid.Column="0" HorizontalAlignment="Center" VerticalContentAlignment="Center" Style="{StaticResource DarkBackgroundTextStyle}"
-                   Content="{Binding UserData.Username, UpdateSourceTrigger=PropertyChanged}" />
+                <Label Grid.Column="0" HorizontalAlignment="Center" VerticalContentAlignment="Center" Style="{StaticResource DarkBackgroundTextStyle}">
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                        <TextBlock Text="You:" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding UserData.Username, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Label>
+                <TextBox Grid.Column="1"
+                         Text="{Binding TypedMessage.Text, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource ChatTextBoxStyle}" />
 
-                <TextBox Grid.Column="1" VerticalContentAlignment="Center"
-                        Text="{Binding TypedMessage.Text, UpdateSourceTrigger=PropertyChanged}" />
                 <Button Grid.Column="2" Content="Send"
-                    Command="{Binding SendMessageCommand}" />
+                        Command="{Binding SendMessageCommand}"
+                        Style="{StaticResource SendButtonStyle}" />
             </Grid>
         </Border>
     </Grid>
